@@ -6,12 +6,9 @@
 #' @importFrom stringr str_detect str_to_title
 #' @export
 find_poke <- function(poke_name) {
-  dat <- load_data()
 
-  poke_name <- str_to_title(poke_name)
-
-  dat |>
-    filter(str_detect(name, poke_name)) |>
+  load_data() |>
+    filter(str_detect(name, str_to_title(poke_name))) |>
     select(name, flavorText) |>
     distinct()
 
@@ -24,16 +21,8 @@ find_poke <- function(poke_name) {
 #' @export
 find_many_pokes <- function(poke_names) {
 
-  result <- dplyr::tibble()
-
-  for (poke_name in poke_names) {
-
-    temp <- find_poke(poke_name)
-
-    result <- rbind(result, temp)
-
-  }
-
-  return(result)
+  poke_names |>
+    purrr::map(find_poke) |>
+    dplyr::bind_rows()
 
 }
